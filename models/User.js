@@ -91,7 +91,7 @@ class User {
   }
 
   async delete(id){
-    var user = this.findById(id);
+    var user = await this.findById(id);
 
     if (user!=undefined){
       try{
