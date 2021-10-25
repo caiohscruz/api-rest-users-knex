@@ -8,8 +8,8 @@ class UserController {
   }
 
   async findUser(req, res){
-    var email = req.params.email;
-    var user = await User.findByEmail(email);
+    var id = req.params.id;
+    var user = await User.findById(id);
     if(user == undefined){
       res.status(404);
       res.json({});

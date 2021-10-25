@@ -14,12 +14,12 @@ class User {
     }
   }
 
-  async findByEmail(email) {
+  async findById(id) {
     try {
       var result = await knex
         .select(["id", "name", "email", "role"])
         .table("users")
-        .where({ email: email });
+        .where({ id: id });
       if (result.length > 0) {
         return result[0];
       } else {
@@ -57,6 +57,11 @@ class User {
       return false;
     }
   }
+
+  async update(id, name, email, role){
+    await this.findEmail
+  }
+
 }
 
 module.exports = new User();
