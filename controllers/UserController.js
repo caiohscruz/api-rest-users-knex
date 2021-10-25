@@ -7,6 +7,18 @@ class UserController {
       res.json(users);
   }
 
+  async findUser(req, res){
+    var email = req.params.email;
+    var user = await User.findByEmail(email);
+    if(user == undefined){
+      res.status(404);
+      res.json({});
+    }else{
+      res.status(200);
+      res.json(user);
+    }
+  }
+
   async create(req, res) {
     var { name, email, password } = req.body;
 
