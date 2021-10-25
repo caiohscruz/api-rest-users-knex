@@ -2,6 +2,16 @@ const knex = require("../database/connection");
 const bcrypt = require("bcrypt");
 
 class User {
+  async findAll() {
+    try {
+      var result = await knex.select(["id", "name", "email", "role"]).table("users");
+      return result;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
   async new(name, email, password) {
     try {
       var hash = await bcrypt.hash(password, 10);
