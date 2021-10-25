@@ -2,7 +2,10 @@ const User = require("../models/User");
 const validator = require('validator');
 
 class UserController {
-  async index(req, res) {}
+  async index(req, res) {
+      var users = await User.findAll();
+      res.json(users);
+  }
 
   async create(req, res) {
     var { name, email, password } = req.body;
