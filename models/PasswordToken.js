@@ -36,7 +36,49 @@ class PasswordToken {
             }
         }
     }
-    
+    async validate(token) {
+        try {
+            var result = await knex
+                .select()
+                .where({
+                    token: token
+                }).table("passwordtokens");
+            if (result.length > 0) {
+                let tk = result[0];
+                if(tk.used==0){
+                    let minutes = 0;
+                    let expires = minutes*60*1000
+
+                    if(tk.created-Date.now()<expires){
+                        return{
+                            status: true
+                        }
+                    }else{
+                        return{
+                            status:false,
+                            err: "Token expirado"
+                        }
+                    }
+                }else{
+                    return{
+                        status: false,
+                        err: "Token já utilizado"
+                    }
+                }
+            }else{
+                return {
+                    status: false,
+                    err: "Token inválido"
+                }
+            }
+        }catch(err) {
+            return{
+                status: false,
+                err: err
+            }
+
+        }
+    }
 }
 
 module.exports = new PasswordToken();
