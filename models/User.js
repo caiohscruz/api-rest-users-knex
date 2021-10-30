@@ -19,7 +19,9 @@ class User {
       var result = await knex
         .select(["id", "name", "email", "role"])
         .table("users")
-        .where({ id: id });
+        .where({
+          id: id
+        });
       if (result.length > 0) {
         return result[0];
       } else {
@@ -35,7 +37,12 @@ class User {
     try {
       var hash = await bcrypt.hash(password, 10);
       await knex
-        .insert({ name, email, password: hash, role: 0 })
+        .insert({
+          name,
+          email,
+          password: hash,
+          role: 0
+        })
         .table("users");
       return true;
     } catch (err) {
@@ -44,17 +51,22 @@ class User {
     }
   }
 
-  async findEmail(email) {
+  async findByEmail(email) {
     try {
-      var result = await knex.select("*").from("users").where({ email: email });
+      var result = await knex
+        .select(["id", "name", "email", "role"])
+        .table("users")
+        .where({
+          email: email
+        });
       if (result.length > 0) {
-        return true;
+        return result[0];
       } else {
-        return false;
+        return undefined;
       }
     } catch (err) {
       console.log(err);
-      return false;
+      return undefined;
     }
   }
 
@@ -69,7 +81,10 @@ class User {
           if (result == false) {
             editUser.email = email;
           } else {
-            return { status: false, err: "Email já utilizado" };
+            return {
+              status: false,
+              err: "Email já utilizado"
+            };
           }
         }
       }
@@ -80,28 +95,48 @@ class User {
         editUser.role = role;
       }
       try {
-        await knex.update(editUser).where({ id: id }).table("users");
-        return { status: true };
+        await knex.update(editUser).where({
+          id: id
+        }).table("users");
+        return {
+          status: true
+        };
       } catch (err) {
-        return { status: false, err: err };
+        return {
+          status: false,
+          err: err
+        };
       }
     } else {
-      return { status: false, err: "Usuário não encontrado" };
+      return {
+        status: false,
+        err: "Usuário não encontrado"
+      };
     }
   }
 
-  async delete(id){
+  async delete(id) {
     var user = await this.findById(id);
 
-    if (user!=undefined){
-      try{
-        await knex.delete().where({id:id}).table("users");
-        return {status:true};
-      }catch(err){
-        return{status:false, err: err}
+    if (user != undefined) {
+      try {
+        await knex.delete().where({
+          id: id
+        }).table("users");
+        return {
+          status: true
+        };
+      } catch (err) {
+        return {
+          status: false,
+          err: err
+        }
       }
-    }else{
-      return {status:false, err: "Usuário não existe"}
+    } else {
+      return {
+        status: false,
+        err: "Usuário não existe"
+      }
     }
   }
 }
