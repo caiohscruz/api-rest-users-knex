@@ -1,5 +1,10 @@
 const knex = require("../database/connection");
 const bcrypt = require("bcrypt");
+
+async function getHash(password) {
+  var hash = await bcrypt.hash(password, 10);
+  return hash;
+}
 class User {
   async findAll() {
     try {
@@ -9,7 +14,7 @@ class User {
       return result;
     } catch (err) {
       console.log(err);
-      return [];
+      return undefined;
     }
   }
 
@@ -31,33 +36,11 @@ class User {
       return undefined;
     }
   }
-  async getHash(password) {
-    var hash = await bcrypt.hash(password, 10);
-    return hash;
-  }
-
-  async new(name, email, password) {
-    try {
-      var hash = await this.getHash(password);
-      await knex
-        .insert({
-          name,
-          email,
-          password: hash,
-          role: 0
-        })
-        .table("users");
-      return true;
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
-  }
 
   async findByEmail(email) {
     try {
       var result = await knex
-        .select(["id", "name", "email", "role"])
+        .select(["id", "name", "password", "email", "role"])
         .table("users")
         .where({
           email: email
@@ -73,75 +56,73 @@ class User {
     }
   }
 
-  async update(id, name, email, role) {
-    var user = this.findById(id);
+  async new(name, email, password) {
+    try {
+      var hash = await getHash(password);
 
-    if (user != undefined) {
-      var editUser = {};
-      if (email != undefined) {
-        if (email != user.email) {
-          var result = await this.findByEmail(email);
-          if (result == false) {
-            editUser.email = email;
-          } else {
-            return {
-              status: false,
-              err: "Email já utilizado"
-            };
-          }
-        }
+      await knex
+        .insert({
+          name,
+          email,
+          password: hash,
+          role: 0
+        })
+        .table("users");
+      return {
+        status: true
       }
-      if (name != undefined) {
-        editUser.name = name;
-      }
-      if (role != undefined) {
-        editUser.role = role;
-      }
-      try {
-        await knex.update(editUser).where({
-          id: id
-        }).table("users");
-        return {
-          status: true
-        };
-      } catch (err) {
-        return {
-          status: false,
-          err: err
-        };
-      }
-    } else {
+    } catch (err) {
       return {
         status: false,
-        err: "Usuário não encontrado"
+        err: err
+      }
+    }
+  }
+
+  async update(id, name, email, role) {
+    var editUser = {};
+
+    if (email != undefined) {
+      editUser.email = email;
+    }
+    if (name != undefined) {
+      editUser.name = name;
+    }
+    if (role != undefined) {
+      editUser.role = role;
+    }
+
+    try {
+      await knex.update(editUser).where({
+        id: id
+      }).table("users");
+      return {
+        status: true
+      };
+    } catch (err) {
+      return {
+        status: false,
+        err: err
       };
     }
   }
 
   async delete(id) {
-    var user = await this.findById(id);
-
-    if (user != undefined) {
-      try {
-        await knex.delete().where({
-          id: id
-        }).table("users");
-        return {
-          status: true
-        };
-      } catch (err) {
-        return {
-          status: false,
-          err: err
-        }
-      }
-    } else {
+    try {
+      await knex.delete().where({
+        id: id
+      }).table("users");
+      return {
+        status: true
+      };
+    } catch (err) {
       return {
         status: false,
-        err: "Usuário não existe"
+        err: err
       }
     }
   }
+
   async updatePassword(id, password) {
     if (password == undefined) {
       return {
@@ -149,64 +130,25 @@ class User {
         err: "Password indefinido"
       }
     }
-
-    var user = this.findById(id);
-
-    if (user != undefined) {
-      try {
-        var hash = await this.getHash(password);
-
-        await knex
-          .update({
-            password: hash
-          })
-          .where({
-            id: id
-          })
-          .table("users");
-        return {
-          status: true
-        };
-      } catch (err) {
-        return {
-          status: false,
-          err: err
-        };
-      }
-    } else {
-      return {
-        status: false,
-        err: "Usuário não encontrado"
-      };
-    }
-  }
-  async validateUser(email, password) {
-
     try {
-      var hash = await this.getHash(password);
+      var hash = await getHash(password);
 
-      var result = await knex
-        .select("id")
-        .table('users')
-        .where({
-          email: email,
+      await knex
+        .update({
           password: hash
         })
-        if(result.length>0){
-          return {
-            status: true
-          }
-        }else{
-          return {
-            status: false,
-            err: "Combinação de usuário e senha inválida"
-          }
-        }
+        .where({
+          id: id
+        })
+        .table("users");
+      return {
+        status: true
+      };
     } catch (err) {
       return {
         status: false,
         err: err
-      }
+      };
     }
   }
 }
