@@ -21,6 +21,9 @@ router.post("/recoverpassword", PasswordTokenController.recoverPassword);
 
 router.put("/changepassword", UserController.changePassword);
 
+router.post("/login", UserController.login);
+
+
 
 
 module.exports = router;
