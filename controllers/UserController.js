@@ -1,5 +1,9 @@
 const User = require("../models/User");
 const validator = require('validator');
+const PasswordToken = require("../models/PasswordToken");
+var jwt = require('jsonwebtoken');
+
+var secret  = "adasdafafsdfagsdg";
 
 class UserController {
   async index(req, res) {
@@ -113,6 +117,28 @@ class UserController {
     } else {
       res.status(406);
       res.send(result.err);
+    }
+  }
+  async changePassword(req, res){
+    var {token, password} = req.body;
+
+    var tokenValidation = await PasswordToken.validate(token);
+
+    if(tokenValidation.status==true){
+      var userId = tokenValidation.token.user_id;
+      var result = await User.updatePassword(userId, password);
+      if (result.status == true) {
+        var tokenId = tokenValidation.token.id;
+        PasswordToken.setUsed(tokenId);
+        res.status(200);
+        res.send("Senha alterada com sucesso");
+      } else {
+        res.status(406);
+        res.send(result.err);
+      }
+    }else{
+      res.status(403);
+      res.send(tokenValidation.err)
     }
   }
 }
