@@ -1,8 +1,11 @@
 const User = require("../models/User");
 const validator = require('validator');
 const PasswordToken = require("../models/PasswordToken");
+
 const bcrypt = require("bcrypt");
 var jwt = require('jsonwebtoken');
+require('dotenv/config');
+
 
 var secret = process.env.SECRET;
 
