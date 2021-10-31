@@ -1,9 +1,10 @@
 const User = require("../models/User");
 const validator = require('validator');
 const PasswordToken = require("../models/PasswordToken");
+const bcrypt = require("bcrypt");
 var jwt = require('jsonwebtoken');
 
-var secret  = "adasdafafsdfagsdg";
+var secret = "adasdafafsdfagsdg";
 
 class UserController {
   async index(req, res) {
@@ -62,9 +63,9 @@ class UserController {
       return;
     }
 
-    var emailExists = await User.findEmail(email);
+    var emailExists = await User.findByEmail(email);
 
-    if (emailExists) {
+    if (emailExists != undefined) {
       res.status(406);
       res.json({
         err: "email já cadastrado"
@@ -74,12 +75,12 @@ class UserController {
 
     var userCreated = await User.new(name, email, password);
 
-    if (userCreated) {
+    if (userCreated.status == true) {
       res.status(200);
       res.send("Usuário cadastrado");
     } else {
-      res.status(500);
-      res.send("Houve algum problema interno");
+      res.status(406);
+      res.send(userCreated.err);
     }
   }
 
@@ -91,24 +92,58 @@ class UserController {
       role
     } = req.body;
 
+    var user = await User.findById(id);
+
+    if (user == undefined) {
+      res.status(404);
+      res.send("Usuário não encontrado");
+      return;
+    }
+
+    if (email != undefined && !validator.isEmail(email)) {
+      res.status(400);
+      res.send({
+        err: "email em formato inválido"
+      });
+      return;
+    }
+
+    if (email != undefined) {
+      var emailExists = await User.findByEmail(email);
+
+      if (emailExists != undefined) {
+        if (emailExists.id != id) {
+          res.status(406);
+          res.send("Email já utilizado");
+          return;
+        }
+      }
+    }
+
     var result = await User.update(id, name, email, role);
 
-    if (result != undefined) {
-      if (result.status == true) {
-        res.status(200);
-        res.send("Editado com sucesso");
-      } else {
-        res.status(406);
-        res.send(result.err);
-      }
+    if (result.status == true) {
+      res.status(200);
+      res.send("Editado com sucesso");
     } else {
       res.status(406);
-      res.send("Ocorreu um erro no servidor");
+      res.send(result.err);
     }
   }
 
   async remove(req, res) {
     var id = req.params.id;
+
+    var user = await User.findById(id);
+
+    if (user == undefined) {
+      res.status(404);
+      res.send({
+        err: "Usuário não encontrado"
+      });
+      return;
+    }
+
     var result = await User.delete(id);
 
     if (result.status == true) {
@@ -119,12 +154,16 @@ class UserController {
       res.send(result.err);
     }
   }
-  async changePassword(req, res){
-    var {token, password} = req.body;
+
+  async changePassword(req, res) {
+    var {
+      token,
+      password
+    } = req.body;
 
     var tokenValidation = await PasswordToken.validate(token);
 
-    if(tokenValidation.status==true){
+    if (tokenValidation.status == true) {
       var userId = tokenValidation.token.user_id;
       var result = await User.updatePassword(userId, password);
       if (result.status == true) {
@@ -136,9 +175,34 @@ class UserController {
         res.status(406);
         res.send(result.err);
       }
-    }else{
+    } else {
       res.status(403);
       res.send(tokenValidation.err)
+    }
+  }
+
+  async login(req, res) {
+    var {
+      email,
+      password
+    } = req.body;
+
+    var user = await User.findByEmail(email);
+
+    if (user != undefined) {
+      var result = await bcrypt.compare(password, user.password);
+      if (result == true) {
+        res.status(200);
+        res.send("Login realizado com sucesso")
+      } else {
+        res.status(401);
+        res.send("Combinação inválida de usuário e senha")
+      }
+    } else {
+      res.status(404);
+      res.send({
+        err: "Usuário não encontrado"
+      })
     }
   }
 }
