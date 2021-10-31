@@ -4,7 +4,6 @@ const {
     v4: uuidv4
 } = require('uuid');
 
-
 class PasswordToken {
     async create(email) {
         var user = await User.findByEmail(email);
@@ -40,43 +39,60 @@ class PasswordToken {
         try {
             var result = await knex
                 .select()
+                .table("passwordtokens")
                 .where({
                     token: token
-                }).table("passwordtokens");
+                })
             if (result.length > 0) {
                 let tk = result[0];
-                if(tk.used==0){
+                if (tk.used == 0) {
                     let minutes = 0;
-                    let expires = minutes*60*1000
+                    let expires = minutes * 60 * 1000
 
-                    if(tk.created-Date.now()<expires){
-                        return{
-                            status: true
+                    if (tk.created - Date.now() < expires) {
+                        return {
+                            status: true,
+                            token: tk
                         }
-                    }else{
-                        return{
-                            status:false,
+                    } else {
+                        return {
+                            status: false,
                             err: "Token expirado"
                         }
                     }
-                }else{
-                    return{
+                } else {
+                    return {
                         status: false,
                         err: "Token já utilizado"
                     }
                 }
-            }else{
+            } else {
                 return {
                     status: false,
                     err: "Token inválido"
                 }
             }
-        }catch(err) {
-            return{
+        } catch (err) {
+            return {
                 status: false,
                 err: err
             }
 
+        }
+    }
+
+    async setUsed(tokenId) {
+        try{
+            await knex
+                .update({
+                    used: 1
+                })
+                .table("passwordtokens")
+                .where({
+                    id: tokenId
+                });
+        }catch(err){
+            console.log(err);
         }
     }
 }
