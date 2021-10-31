@@ -1,6 +1,5 @@
 const knex = require("../database/connection");
 const bcrypt = require("bcrypt");
-
 class User {
   async findAll() {
     try {
@@ -77,7 +76,7 @@ class User {
       var editUser = {};
       if (email != undefined) {
         if (email != user.email) {
-          var result = await this.findEmail(email);
+          var result = await this.findByEmail(email);
           if (result == false) {
             editUser.email = email;
           } else {
@@ -139,6 +138,45 @@ class User {
       }
     }
   }
+  async updatePassword(id, password) {
+    if (password == undefined) {
+      return {
+        status: false,
+        err: "Password indefinido"
+      }
+    }
+
+    var user = this.findById(id);
+
+    if (user != undefined) {
+      try {
+        var hash = await bcrypt.hash(password, 10);
+
+        await knex
+          .update({
+            password: hash
+          })
+          .where({
+            id: id
+          })
+          .table("users");
+        return {
+          status: true
+        };
+      } catch (err) {
+        return {
+          status: false,
+          err: err
+        };
+      }
+    } else {
+      return {
+        status: false,
+        err: "Usuário não encontrado"
+      };
+    }
+  }
 }
+
 
 module.exports = new User();
