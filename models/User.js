@@ -31,10 +31,14 @@ class User {
       return undefined;
     }
   }
+  async getHash(password) {
+    var hash = await bcrypt.hash(password, 10);
+    return hash;
+  }
 
   async new(name, email, password) {
     try {
-      var hash = await bcrypt.hash(password, 10);
+      var hash = await this.getHash(password);
       await knex
         .insert({
           name,
@@ -150,7 +154,7 @@ class User {
 
     if (user != undefined) {
       try {
-        var hash = await bcrypt.hash(password, 10);
+        var hash = await this.getHash(password);
 
         await knex
           .update({
@@ -174,6 +178,35 @@ class User {
         status: false,
         err: "Usuário não encontrado"
       };
+    }
+  }
+  async validateUser(email, password) {
+
+    try {
+      var hash = await this.getHash(password);
+
+      var result = await knex
+        .select("id")
+        .table('users')
+        .where({
+          email: email,
+          password: hash
+        })
+        if(result.length>0){
+          return {
+            status: true
+          }
+        }else{
+          return {
+            status: false,
+            err: "Combinação de usuário e senha inválida"
+          }
+        }
+    } catch (err) {
+      return {
+        status: false,
+        err: err
+      }
     }
   }
 }
