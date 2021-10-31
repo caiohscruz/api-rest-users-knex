@@ -4,6 +4,7 @@ const router = express.Router();
 const HomeController = require("../controllers/HomeController");
 const UserController = require("../controllers/UserController");
 const PasswordTokenController = require("../controllers/PasswordTokenController");
+const AdminAuth =  require("../middleware/AdminAuth");
 
 router.get('/', HomeController.index);
 
@@ -13,9 +14,9 @@ router.get('/user/:id', UserController.findUser);
 
 router.post("/user", UserController.create);
 
-router.put("/user", UserController.edit);
+router.put("/user", AdminAuth, UserController.edit);
 
-router.delete("/user/:id", UserController.remove);
+router.delete("/user/:id", AdminAuth, UserController.remove);
 
 router.post("/recoverpassword", PasswordTokenController.recoverPassword);
 
