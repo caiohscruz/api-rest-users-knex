@@ -4,7 +4,7 @@ const PasswordToken = require("../models/PasswordToken");
 const bcrypt = require("bcrypt");
 var jwt = require('jsonwebtoken');
 
-var secret = "adasdafafsdfagsdg";
+var secret = process.env.SECRET;
 
 class UserController {
   async index(req, res) {
@@ -192,8 +192,10 @@ class UserController {
     if (user != undefined) {
       var result = await bcrypt.compare(password, user.password);
       if (result == true) {
+        var token = jwt.sign({email: user.email, role: user.role}, secret)
+
         res.status(200);
-        res.send("Login realizado com sucesso")
+        res.send({token: token})
       } else {
         res.status(401);
         res.send("Combinação inválida de usuário e senha")
