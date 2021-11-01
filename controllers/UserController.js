@@ -195,10 +195,24 @@ class UserController {
     if (user != undefined) {
       var result = await bcrypt.compare(password, user.password);
       if (result == true) {
-        var token = jwt.sign({email: user.email, role: user.role}, secret)
-
-        res.status(200);
-        res.send({token: token})
+        jwt.sign({
+          id: user.id,
+          username: user.username
+        }, secret, {
+          expiresIn: "2h"
+        }, (err, token) => {
+          if (err) {
+            res.status(400)
+            res.json({
+              err: "Falha interna"
+            })
+          } else {
+            res.status(200)
+            res.json({
+              token: token
+            })
+          }
+        })
       } else {
         res.status(401);
         res.send("Combinação inválida de usuário e senha")
