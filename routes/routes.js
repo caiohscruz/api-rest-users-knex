@@ -1,12 +1,9 @@
 const express = require("express")
 const app = express();
 const router = express.Router();
-const HomeController = require("../controllers/HomeController");
 const UserController = require("../controllers/UserController");
 const PasswordTokenController = require("../controllers/PasswordTokenController");
 const AdminAuth =  require("../middleware/AdminAuth");
-
-router.get('/', HomeController.index);
 
 router.get('/user', UserController.index);
 
