@@ -5,3 +5,10 @@ DB_PASSWORD = /* database's password */
 DB_NAME = /* database's name */
 
 SECRET = /* any string to encoding tokens */
+
+/* search for "SMTP {email provider}" */
+SMTP_HOST = /* SMTPs's host */
+SMTP_PORT = /* SMTP's port */
+SMTP_SECURE = /* use SSL/TLS ? true : false */
+SMTP_USER = /* email's login */
+SMTP_SECURE = /* email's password */
