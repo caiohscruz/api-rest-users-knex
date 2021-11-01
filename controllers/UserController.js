@@ -42,6 +42,14 @@ class UserController {
       return;
     }
 
+    if (name.trim() == '') {
+      res.status(400);
+      res.send({
+        err: "name em branco"
+      });
+      return;
+    }
+
     if (email == undefined) {
       res.status(400);
       res.send({
@@ -62,6 +70,14 @@ class UserController {
       res.status(400);
       res.send({
         err: "password não enviado"
+      });
+      return;
+    }
+
+    if (password.trim() == '') {
+      res.status(400);
+      res.send({
+        err: "password em branco"
       });
       return;
     }
