@@ -12,7 +12,7 @@ var secret = process.env.SECRET;
 class UserController {
   async index(req, res) {
     var users = await User.findAll();
-    res.json(users);
+    res.send(users);
   }
 
   async findUser(req, res) {
@@ -20,10 +20,10 @@ class UserController {
     var user = await User.findById(id);
     if (user == undefined) {
       res.status(404);
-      res.json({});
+      res.send({});
     } else {
       res.status(200);
-      res.json(user);
+      res.send(user);
     }
   }
 
@@ -36,49 +36,37 @@ class UserController {
 
     if (name == undefined) {
       res.status(400);
-      res.send({
-        err: "name não enviado"
-      });
+      res.send("Nome de usuário não enviado");
       return;
     }
 
     if (name.trim() == '') {
       res.status(400);
-      res.send({
-        err: "name em branco"
-      });
+      res.send("Nome de usuário em branco");
       return;
     }
 
     if (email == undefined) {
       res.status(400);
-      res.send({
-        err: "email não enviado"
-      });
+      res.send("Email não enviado");
       return;
     }
 
     if (!validator.isEmail(email)) {
       res.status(400);
-      res.send({
-        err: "email em formato inválido"
-      });
+      res.send("E-mail em formato inválido");
       return;
     }
 
     if (password == undefined) {
       res.status(400);
-      res.send({
-        err: "password não enviado"
-      });
+      res.send("Password não enviado");
       return;
     }
 
     if (password.trim() == '') {
       res.status(400);
-      res.send({
-        err: "password em branco"
-      });
+      res.send("Password em branco");
       return;
     }
 
@@ -86,9 +74,7 @@ class UserController {
 
     if (emailExists != undefined) {
       res.status(406);
-      res.json({
-        err: "email já cadastrado"
-      });
+      res.send("E-mail já cadastrado");
       return;
     }
 
@@ -121,9 +107,7 @@ class UserController {
 
     if (email != undefined && !validator.isEmail(email)) {
       res.status(400);
-      res.send({
-        err: "email em formato inválido"
-      });
+      res.send("E-mail em formato inválido");
       return;
     }
 
@@ -133,7 +117,7 @@ class UserController {
       if (emailExists != undefined) {
         if (emailExists.id != id) {
           res.status(406);
-          res.send("Email já utilizado");
+          res.send("E-mail já utilizado");
           return;
         }
       }
@@ -152,14 +136,12 @@ class UserController {
 
   async remove(req, res) {
     var id = req.params.id;
-
+    console.log(id);
     var user = await User.findById(id);
 
     if (user == undefined) {
       res.status(404);
-      res.send({
-        err: "Usuário não encontrado"
-      });
+      res.send("Usuário não encontrado");
       return;
     }
 
@@ -196,7 +178,7 @@ class UserController {
       }
     } else {
       res.status(403);
-      res.send(tokenValidation.err)
+      res.send(tokenValidation.err);
     }
   }
 
@@ -213,20 +195,17 @@ class UserController {
       if (result == true) {
         jwt.sign({
           id: user.id,
-          username: user.username
+          username: user.username,
+          role: user.role
         }, secret, {
           expiresIn: "2h"
         }, (err, token) => {
           if (err) {
-            res.status(400)
-            res.json({
-              err: "Falha interna"
-            })
+            res.status(400);
+            res.send("Falha interna");
           } else {
-            res.status(200)
-            res.json({
-              token: token
-            })
+            res.status(200);
+            res.send(token);
           }
         })
       } else {
@@ -235,10 +214,12 @@ class UserController {
       }
     } else {
       res.status(404);
-      res.send({
-        err: "Usuário não encontrado"
-      })
+      res.send("Usuário não encontrado")
     }
+  }
+  async validate(req, res) {
+    res.status(200);
+    res.send("Autorizado");
   }
 }
 
