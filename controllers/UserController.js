@@ -20,7 +20,7 @@ class UserController {
     var user = await User.findById(id);
     if (user == undefined) {
       res.status(404);
-      res.send({});
+      res.send("Usuário não encontrado");
     } else {
       res.status(200);
       res.send(user);
