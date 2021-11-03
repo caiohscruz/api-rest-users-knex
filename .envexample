@@ -11,4 +11,6 @@ SMTP_HOST = /* SMTPs's host */
 SMTP_PORT = /* SMTP's port */
 SMTP_SECURE = /* use SSL/TLS ? true : false */
 SMTP_USER = /* email's login */
-SMTP_SECURE = /* email's password */
+SMTP_PASS = /* email's password */
+
+DEPLOY = /* page to redefine password */
