@@ -3,7 +3,10 @@ const app = express();
 const router = express.Router();
 const UserController = require("../controllers/UserController");
 const PasswordTokenController = require("../controllers/PasswordTokenController");
+const HomeController = require("../controllers/HomeController");
 const AdminAuth =  require("../middleware/AdminAuth");
+
+router.get("/", HomeController.index);
 
 router.post("/user", UserController.create);
 
