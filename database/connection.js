@@ -4,7 +4,7 @@ require('dotenv/config');
 /* e não consegui setar o knex com a string de conexão fornecida pelo JAWSDB */
 /* resolvi extrair os dado que precisava para estabelecer a conexão */
 /* Este é o formato da string fornecida => mysql://DB_USERNAME:DB_PASSWORD@DB_HOST:DB_PORT/DB_NAME */
-
+/*
 const DB_USERNAME = process.env.JAWSDB_URL.split(':')[1].replace('//','');
 const DB_PASSWORD = process.env.JAWSDB_URL.split(':')[2].split('@')[0];
 const DB_HOST = process.env.JAWSDB_URL.split(':')[2].split('@')[1];
@@ -19,7 +19,7 @@ var knex = require('knex')({
       database : DB_NAME
     }
   });
-
+*/
 /* Caso tenha os valores sejam estáticos, pode utilizar o trecho abaixo em vez do anterior */
 /*
 var knex = require('knex')({
@@ -32,5 +32,12 @@ var knex = require('knex')({
     }
   });
 */
+
+/* Alternativa mais enxuta */
+/* https://stackoverflow.com/questions/38581169/how-do-i-add-charset-to-knex-js-connection-string  */
+var knex = require('knex')({
+  client: 'mysql2',
+  connection: process.env.JAWSDB_URL +"?charset=utf8mb4"
+})
 
 module.exports = knex
