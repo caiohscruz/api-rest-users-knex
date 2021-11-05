@@ -25,6 +25,22 @@ class PasswordTokenController {
       res.send(result.err)
     }
   }
+  async validate(req, res) {
+    var token = req.body.token;
+    if (token == undefined) {
+      res.status(400);
+      res.send("Token não enviado");
+      return;
+    }
+    var result = await PasswordToken.validate(token);
+    if (result.status == true) {
+      res.status(200);
+      res.send("Token válido");
+    } else {
+      res.status(406);
+      res.send(result.err)
+    }
+  }
 }
 
 module.exports = new PasswordTokenController();
