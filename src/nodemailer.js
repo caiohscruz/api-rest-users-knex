@@ -17,7 +17,7 @@ module.exports = (email, token) => {
         to: email,
         subject: "Teste NodeMailer",
         html: `Prezado(a)
-            <a href='${process.env.DEPLOY}/redefine-password/${token}'>Clique aqui<a> para redefinição de senha`
+            <a href='${process.env.DEPLOY}/${token}'>Clique aqui<a> para redefinição de senha`
     }).then(() => {
         return {
             status: true
