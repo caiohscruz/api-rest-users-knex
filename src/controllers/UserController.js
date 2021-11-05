@@ -156,7 +156,7 @@ class UserController {
     }
   }
 
-  async changePassword(req, res) {
+  async redefinePassword(req, res) {
     var {
       token,
       password
