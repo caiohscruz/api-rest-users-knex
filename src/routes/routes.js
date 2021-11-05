@@ -18,9 +18,11 @@ router.put("/user", AdminAuth, UserController.edit);
 
 router.delete("/user/:id", AdminAuth, UserController.remove);
 
-router.post("/recoverpassword", PasswordTokenController.recoverPassword);
+router.post("/recover-password", PasswordTokenController.recoverPassword);
 
-router.put("/changepassword", UserController.changePassword);
+router.put("/redefine-password", UserController.redefinePassword);
+
+router.post("/validate-password-token", PasswordTokenController.validate);
 
 router.post("/login", UserController.login);
 
